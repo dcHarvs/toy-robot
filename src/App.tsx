@@ -3,6 +3,9 @@ import Console from "./components/Console";
 import Table from "./components/Table";
 import { TABLE_SIZE } from "./lib/constants/tableSize";
 import { RobotPosititon } from "./components/Robot";
+import { Commands } from "./lib/Commands";
+
+const commands = new Commands(TABLE_SIZE);
 
 function App() {
   const [robotPosition, setRobotPosition] = useState<RobotPosititon>({
@@ -12,7 +15,15 @@ function App() {
   });
 
   const handleCommandChange = (command: string) => {
-    console.log(command);
+    const { newPosition, error } = commands.processCommand(command, robotPosition);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    if (newPosition)
+      setRobotPosition(newPosition);
   }
 
   return (
