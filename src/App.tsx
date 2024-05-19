@@ -1,8 +1,14 @@
+import Console from "./components/Console";
+
 function App() {
+  const handleCommandChange = (command: string) => {
+    console.log(command);
+  }
+
   return (
-    <>
-      <h1>Hello world</h1>
-    </>
+    <main className="h-full w-full flex flex-col gap-2 p-2">
+      <Console onCommandSent={handleCommandChange} />
+    </main>
   )
 }
 
