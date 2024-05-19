@@ -1,0 +1,1 @@
+export const TABLE_SIZE = { rows: 5, cols: 5 };
