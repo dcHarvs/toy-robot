@@ -29,7 +29,7 @@ export default function Console() {
   }
 
   return (
-    <section className="w-full max-w-screen-md h-1/3 place-self-center bg-gray-950 rounded-lg flex flex-col">
+    <section className="flex-1 bg-gray-950 rounded-lg flex flex-col">
       <History data={history} />
       <Input onCommandSend={handleSendCommand} />
     </section>

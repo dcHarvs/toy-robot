@@ -12,7 +12,7 @@ export default function Table({ layout: { rows, cols },  }: Props) {
   const { robotPosition } = useRootProvider();
 
   return (
-    <section className="place-self-center rounded-lg p-2 border border-dashed border-gray-600 relative flex flex-col gap-1">
+    <div className="rounded-lg p-2 border border-dashed border-gray-600 relative flex flex-col gap-1">
       {Array.from(new Array(rows)).map((_, key) => {
         return (
           <div
@@ -33,6 +33,6 @@ export default function Table({ layout: { rows, cols },  }: Props) {
       })}
 
       <Robot position={robotPosition} />
-    </section>
+    </div>
   )
 }
