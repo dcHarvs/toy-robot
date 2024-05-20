@@ -4,6 +4,7 @@ import { Direction } from "./types/direction";
 type CommandResultType = {
   newPosition?: RobotPosititon;
   error?: string;
+  report?: string;
 }
 
 const validDirections = new Set<Direction>(["NORTH", "SOUTH", "EAST", "WEST"]);
@@ -16,11 +17,11 @@ export class Commands {
   }
 
   private isOutOfBounds({ x, y }: RobotPosititon): boolean {
-    return x < 0 || x > this.tableSize.rows || y < 0 || y > this.tableSize.rows
+    return (x + 1) < 0 || (x + 1) > this.tableSize.rows || (y + 1) < 0 || (y + 1) > this.tableSize.cols
   }
 
   private isValidDirection(direction: string): boolean {
-    return validDirections.has(direction as Direction);
+    return validDirections.has(direction.toUpperCase() as Direction);
   }
 
   private move({ x, y, direction }: RobotPosititon) {
@@ -39,7 +40,7 @@ export class Commands {
     };
 
     if (this.isOutOfBounds(newPosition)) {
-      return { x, y, direction }
+      return { error: "Unable to move further" }
     }
 
     return { newPosition };
@@ -50,16 +51,16 @@ export class Commands {
 
     switch (position.direction) {
       case "NORTH":
-        newPosition.direction = (newDirection === "left" ? "WEST" : "EAST") as Direction
+        newPosition.direction = (newDirection === "left" ? "WEST" : "EAST")
         break;
       case "SOUTH":
-        newPosition.direction = (newDirection === "left" ? "EAST" : "WEST") as Direction
+        newPosition.direction = (newDirection === "left" ? "EAST" : "WEST")
         break;
       case "WEST":
-        newPosition.direction = (newDirection === "left" ? "SOUTH" : "NORTH") as Direction
+        newPosition.direction = (newDirection === "left" ? "SOUTH" : "NORTH")
         break;
       case "EAST":
-        newPosition.direction = (newDirection === "left" ? "NORTH" : "SOUTH") as Direction
+        newPosition.direction = (newDirection === "left" ? "NORTH" : "SOUTH")
         break;
     }
 
@@ -74,13 +75,13 @@ export class Commands {
     const [x, y, direction] = params;
 
     if (!this.isValidDirection(direction)) return {
-      error: "Direction given is invalid"
+      error: `Direction "${direction}" is invalid`
     }
 
     const newPosition = {
       x: parseInt(x),
       y: parseInt(y),
-      direction: direction as Direction,
+      direction: direction.toUpperCase() as Direction,
     }
 
     if (this.isOutOfBounds(newPosition as RobotPosititon)) {
@@ -90,8 +91,14 @@ export class Commands {
     return { newPosition }
   }
 
+  private report({ x, y, direction }: RobotPosititon) {
+    return {
+      report: `Current Position: ${x},${y},${direction}`,
+    }
+  }
+
   processCommand(input: string, prevPosition: RobotPosititon): CommandResultType {
-    const [command, ...params] = input.split(/[, ,]+/);
+    const [command, ...params] = (input.trimEnd()).split(/[, ,]+/);
     let result: CommandResultType = {};
 
     switch (command.toLowerCase()) {
@@ -108,8 +115,11 @@ export class Commands {
         result = this.place(params);
         break;
       }
+      case "report":
+        result = this.report(prevPosition);
+        break;
       default:
-        result = { error: "Unknown command" }
+        result = { error: `Unknown command "${command}"` }
     }
 
     return result;

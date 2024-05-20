@@ -1,18 +1,31 @@
-import { useState } from "react"
 import Input from "./Input";
 import History from "./History";
+import { useRootProvider } from "../../lib/useRootContext";
+import { Commands } from "../../lib/Commands";
+import { TABLE_SIZE } from "../../lib/constants/tableSize";
 
-type Props = {
-  onCommandSent: (command: string) => void;
-}
+const commands = new Commands(TABLE_SIZE);
 
-export default function Console({ onCommandSent, }: Props) {
-  const [history, setHistory] = useState<string[]>([]);
+export default function Console() {
+  const { history = [], robotPosition, setHistory, setRobotPosition } = useRootProvider();
 
   const handleSendCommand = (newCommand: string) => {
-    const newHistory = [newCommand, ...history];
+    const { newPosition, error, report } = commands.processCommand(newCommand, robotPosition);
+
+    if (error) {
+      setHistory([{ text: error, isError: true }, ...history]);
+      return;
+    }
+
+    if (report) {
+      setHistory([{ text: report }, ...history]);
+      return;
+    }
+
+    const newHistory = [{ text: newCommand }, ...history];
     setHistory(newHistory);
-    onCommandSent(newCommand);
+
+    if (newPosition) setRobotPosition(newPosition);
   }
 
   return (
